@@ -3,7 +3,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   ChevronLeft, 
   ChevronRight,
-  Coffee
+  Coffee,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { CALENDAR_DATA, DayData, Saint } from './data/calendarData';
 import * as cheerio from 'cheerio';
@@ -138,7 +140,7 @@ const transliterateCyrlToLatn = (text: string) => {
 };
 
 const StarIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[var(--color-byz-gold)]">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[var(--color-byz-gold-shiny)] animate-pulse drop-shadow-md">
     <path d="M12 2L13.5 9.5L21 11L13.5 12.5L12 20L10.5 12.5L3 11L10.5 9.5L12 2Z" fill="currentColor"/>
   </svg>
 );
@@ -158,6 +160,7 @@ const CornerTR = () => (
 );
 
 export default function App() {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('theme') as 'light' | 'dark') || 'light');
   const [language, setLanguage] = useState<Language>(() => (localStorage.getItem('language') as Language) || 'sr-Cyrl');
   const [viewDate, setViewDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -171,6 +174,15 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('language', language);
   }, [language]);
+
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   useEffect(() => {
     const fetchMonthData = async () => {
@@ -377,25 +389,35 @@ export default function App() {
     <div className="min-h-screen bg-[var(--color-byz-bg)] text-[var(--color-byz-gold)] font-serif flex justify-center py-8 px-4">
       <div className="w-full max-w-md relative">
         
-        {/* Language Selector */}
-        <div className="flex justify-center gap-2 mb-8 relative z-10">
-          {(['en', 'sr-Latn', 'sr-Cyrl'] as Language[]).map((lang) => {
-            const label = lang === 'en' ? 'EN' : lang === 'sr-Latn' ? 'LAT' : 'ЋИР';
-            const isActive = language === lang;
-            return (
-              <button
-                key={lang}
-                onClick={() => setLanguage(lang)}
-                className={`px-4 py-1 text-xs tracking-widest border transition-all ${
-                  isActive 
-                    ? 'border-[var(--color-byz-gold)] bg-[var(--color-byz-gold-dim)] text-[var(--color-byz-gold)]' 
-                    : 'border-[var(--color-byz-gold-dim)] text-[var(--color-byz-gold-muted)] hover:border-[var(--color-byz-gold-muted)]'
-                }`}
-              >
-                {label}
-              </button>
-            );
-          })}
+        {/* Top Navigation */}
+        <div className="flex justify-between items-center mb-8 relative z-10">
+          <div className="flex gap-2">
+            {(['en', 'sr-Latn', 'sr-Cyrl'] as Language[]).map((lang) => {
+              const label = lang === 'en' ? 'EN' : lang === 'sr-Latn' ? 'LAT' : 'ЋИР';
+              const isActive = language === lang;
+              return (
+                <button
+                  key={lang}
+                  onClick={() => setLanguage(lang)}
+                  className={`px-5 py-2 rounded-full text-xs font-bold tracking-widest border-2 transition-all duration-300 hover:scale-105 hover:shadow-md ${
+                    isActive 
+                      ? 'border-[var(--color-byz-gold)] bg-[var(--color-byz-gold)] text-[var(--color-byz-surface)] shadow-md' 
+                      : 'border-[var(--color-byz-gold-dim)] text-[var(--color-byz-gold-muted)] hover:border-[var(--color-byz-gold-shiny)] hover:text-[var(--color-byz-gold)] bg-[var(--color-byz-glass)]'
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+            className="p-2.5 rounded-full border-2 border-[var(--color-byz-gold-dim)] text-[var(--color-byz-gold-muted)] hover:border-[var(--color-byz-gold-shiny)] hover:text-[var(--color-byz-gold)] bg-[var(--color-byz-glass)] transition-all duration-300 shadow-sm hover:shadow-md"
+            aria-label="Toggle Theme"
+          >
+            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+          </button>
         </div>
 
         {/* Header Section */}
@@ -413,10 +435,10 @@ export default function App() {
           <h3 className="text-lg italic mb-2 text-[var(--color-byz-gold)]">
             {t.subtitle}
           </h3>
-          <h1 className="text-7xl font-bold mb-4 text-[var(--color-byz-gold)] tracking-tight">
+          <h1 className="text-7xl font-bold mb-4 bg-gradient-to-br from-[var(--color-byz-gold)] via-[var(--color-byz-gold-shiny)] to-[var(--color-byz-gold)] bg-clip-text text-transparent drop-shadow-sm tracking-tight hover:scale-105 transition-transform duration-500 cursor-default">
             {currentSerbianYear}
           </h1>
-          <p className="text-[10px] tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase">
+          <p className="text-xs tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase">
             {t.creation}
           </p>
         </div>
@@ -432,26 +454,43 @@ export default function App() {
         <div className="flex items-center justify-between mb-8 px-4">
           <button 
             onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1))}
-            className="p-3 border border-[var(--color-byz-gold-dim)] rounded hover:bg-[var(--color-byz-gold-dim)] transition-colors"
+            className="p-3 border-2 border-[var(--color-byz-gold-dim)] rounded-full bg-[var(--color-byz-glass)] hover:bg-[var(--color-byz-gold-dim)] hover:scale-110 hover:shadow-md transition-all duration-300"
           >
             <ChevronLeft className="w-4 h-4 text-[var(--color-byz-gold-muted)]" />
           </button>
           
-          <div className="text-center">
-            <h2 className="text-4xl font-medium mb-1">
+          <div className="text-center flex-1">
+            <motion.h2 
+              key={`month-${viewDate.getMonth()}`}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-5xl font-bold mb-2 tracking-tight text-[var(--color-byz-gold)]"
+            >
               {t.traditionalMonths[viewDate.getMonth()].name}
-            </h2>
-            <p className="text-[10px] tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase mb-1">
+            </motion.h2>
+            <motion.p 
+              key={`desc-${viewDate.getMonth()}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="text-sm tracking-[0.15em] text-[var(--color-byz-gold-muted)] italic mb-2"
+            >
               {t.traditionalMonths[viewDate.getMonth()].description}
-            </p>
-            <p className="text-xs text-[var(--color-byz-gold-muted)]">
+            </motion.p>
+            <motion.p 
+              key={`year-${viewDate.getFullYear()}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-lg font-medium tracking-[0.3em] text-[var(--color-byz-gold-dim)] uppercase"
+            >
               {viewDate.getFullYear()}
-            </p>
+            </motion.p>
           </div>
 
           <button 
             onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1))}
-            className="p-3 border border-[var(--color-byz-gold-dim)] rounded hover:bg-[var(--color-byz-gold-dim)] transition-colors"
+            className="p-3 border-2 border-[var(--color-byz-gold-dim)] rounded-full bg-[var(--color-byz-glass)] hover:bg-[var(--color-byz-gold-dim)] hover:scale-110 hover:shadow-md transition-all duration-300"
           >
             <ChevronRight className="w-4 h-4 text-[var(--color-byz-gold-muted)]" />
           </button>
@@ -495,13 +534,13 @@ export default function App() {
         </div>
 
         {/* Selected Day Info */}
-        <div className="border border-[var(--color-byz-gold-dim)] p-6 mb-6 relative">
+        <div className="border-2 border-[var(--color-byz-gold-dim)] rounded-3xl p-6 mb-6 relative bg-[var(--color-byz-glass)] shadow-lg backdrop-blur-sm hover:shadow-xl transition-shadow duration-300">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <p className="text-[10px] tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase mb-2">
+              <p className="text-xs tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase mb-2">
                 {t.selectedDay}
               </p>
-              <h3 className="text-2xl font-medium mb-1">
+              <h3 className="text-2xl font-bold mb-1">
                 {selectedDate.getDate()}. {t.traditionalMonths[selectedDate.getMonth()].name}
               </h3>
               <p className="text-sm text-[var(--color-byz-gold-muted)]">
@@ -509,10 +548,10 @@ export default function App() {
               </p>
             </div>
             <div className="text-right">
-              <p className="text-[10px] tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase mb-2">
+              <p className="text-xs tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase mb-2">
                 {t.byzantineEra}
               </p>
-              <h3 className="text-2xl font-medium">
+              <h3 className="text-2xl font-bold">
                 {selectedDate.getFullYear()}
               </h3>
             </div>
@@ -520,7 +559,7 @@ export default function App() {
 
           <div className="pt-4 border-t border-[var(--color-byz-gold-dim)]">
             {selectedDayData.feast && (
-              <p className="text-lg font-medium text-[var(--color-byz-red)] mb-2">
+              <p className="text-lg font-bold text-[var(--color-byz-red)] mb-2">
                 {language === 'sr-Cyrl' ? transliterate(selectedDayData.feast) : selectedDayData.feast}
               </p>
             )}
@@ -529,13 +568,13 @@ export default function App() {
                 {language === 'sr-Cyrl' ? transliterate(selectedDayData.fastingDescription) : selectedDayData.fastingDescription}
               </p>
             )}
-            <h4 className="text-[10px] tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase mb-3">
+            <h4 className="text-xs tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase mb-3">
               {language === 'en' ? 'Saints of the Day' : (language === 'sr-Cyrl' ? transliterate('Svetitelji Dana') : 'Svetitelji Dana')}
             </h4>
             <div className="space-y-3">
               {selectedDayData.saints.map((saint, idx) => (
                 <div key={idx}>
-                  <p className="font-medium text-[var(--color-byz-gold)]">
+                  <p className="font-bold text-[var(--color-byz-gold)]">
                     {language === 'sr-Cyrl' ? transliterate(saint.name) : saint.name}
                     {saint.title && (
                       <span className="text-[var(--color-byz-gold-muted)] text-sm ml-1">
@@ -550,12 +589,12 @@ export default function App() {
         </div>
 
         {/* About Accordion */}
-        <div className="border border-[var(--color-byz-gold-dim)] mb-4">
+        <div className="border-2 border-[var(--color-byz-gold-dim)] rounded-2xl mb-4 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
           <button 
             onClick={() => setShowAbout(!showAbout)}
-            className="w-full p-4 flex items-center justify-center gap-2 text-xs tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase hover:bg-[var(--color-byz-surface)] transition-colors"
+            className="w-full p-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase hover:bg-[var(--color-byz-surface)] hover:scale-[1.02] transition-all duration-300"
           >
-            <span className="text-[8px]">{showAbout ? '▼' : '▲'}</span> {t.aboutCalendar}
+            <span className="text-[10px]">{showAbout ? '▼' : '▲'}</span> {t.aboutCalendar}
           </button>
           <AnimatePresence>
             {showAbout && (
@@ -570,8 +609,8 @@ export default function App() {
                     <p key={i} className={i === t.aboutText.length - 1 ? 'italic text-xs mt-6' : ''}>{text}</p>
                   ))}
                   
-                  <div className="mt-6 p-4 border border-[var(--color-byz-gold-dim)] bg-[var(--color-byz-surface)] rounded-sm">
-                    <h4 className="text-[var(--color-byz-gold)] font-medium mb-2">{t.highlightBoxTitle}</h4>
+                  <div className="mt-6 p-5 border-2 border-[var(--color-byz-gold-dim)] bg-[var(--color-byz-surface)] rounded-2xl shadow-inner">
+                    <h4 className="text-[var(--color-byz-gold)] font-bold mb-2">{t.highlightBoxTitle}</h4>
                     <p className="text-sm leading-relaxed text-[var(--color-byz-gold)]">{t.highlightBoxText}</p>
                   </div>
                 </div>
@@ -581,12 +620,12 @@ export default function App() {
         </div>
 
         {/* Historical Context Accordion */}
-        <div className="border border-[var(--color-byz-gold-dim)] mb-12">
+        <div className="border-2 border-[var(--color-byz-gold-dim)] rounded-2xl mb-12 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
           <button 
             onClick={() => setShowHistoricalContext(!showHistoricalContext)}
-            className="w-full p-4 flex items-center justify-center gap-2 text-xs tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase hover:bg-[var(--color-byz-surface)] transition-colors"
+            className="w-full p-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase hover:bg-[var(--color-byz-surface)] hover:scale-[1.02] transition-all duration-300"
           >
-            <span className="text-[8px]">{showHistoricalContext ? '▼' : '▲'}</span> {t.historicalContextTitle}
+            <span className="text-[10px]">{showHistoricalContext ? '▼' : '▲'}</span> {t.historicalContextTitle}
           </button>
           <AnimatePresence>
             {showHistoricalContext && (
@@ -616,7 +655,7 @@ export default function App() {
         {/* Donation Section */}
         <div className="mb-12">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-medium italic mb-2">{t.donationTitle}</h2>
+            <h2 className="text-3xl font-bold italic mb-2">{t.donationTitle}</h2>
             <p className="text-sm text-[var(--color-byz-gold-muted)]">{t.donationSubtitle}</p>
           </div>
 
@@ -630,22 +669,22 @@ export default function App() {
               <button
                 key={item.amount}
                 onClick={() => handleDonationSelect(item.amount)}
-                className={`p-6 border flex flex-col items-center justify-center text-center transition-all ${
+                className={`p-6 border-2 rounded-3xl flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-105 hover:shadow-lg ${
                   donationAmount === item.amount && !customAmount
-                    ? 'border-[var(--color-byz-gold)] bg-[var(--color-byz-gold-dim)]'
-                    : 'border-[var(--color-byz-gold-dim)] bg-[var(--color-byz-surface)] hover:border-[var(--color-byz-gold-muted)]'
+                    ? 'border-[var(--color-byz-gold-shiny)] bg-[var(--color-byz-gold)] text-[var(--color-byz-surface)] shadow-md'
+                    : 'border-[var(--color-byz-gold-dim)] bg-[var(--color-byz-glass)] hover:border-[var(--color-byz-gold-shiny)] hover:bg-[var(--color-byz-surface)]'
                 }`}
               >
                 <span className="text-2xl mb-2">{item.icon}</span>
                 <span className="text-xl font-bold mb-1">${item.amount}</span>
                 <span className="text-sm italic mb-1">{item.title}</span>
-                <span className="text-[10px] text-[var(--color-byz-gold-muted)]">{item.desc}</span>
+                <span className="text-xs text-[var(--color-byz-gold-muted)]">{item.desc}</span>
               </button>
             ))}
           </div>
 
           <div className="mb-6">
-            <label className="block text-[10px] tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase mb-2">
+            <label className="block text-xs tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase mb-2">
               {t.orEnterAmount}
             </label>
             <div className="relative">
@@ -655,12 +694,12 @@ export default function App() {
                 value={customAmount}
                 onChange={handleCustomAmountChange}
                 placeholder="0.00"
-                className="w-full bg-[var(--color-byz-surface)] border border-[var(--color-byz-gold-dim)] rounded-none p-4 pl-8 text-[var(--color-byz-gold)] focus:outline-none focus:border-[var(--color-byz-gold)] transition-colors"
+                className="w-full bg-[var(--color-byz-glass)] border-2 border-[var(--color-byz-gold-dim)] rounded-2xl p-4 pl-8 text-[var(--color-byz-gold)] focus:outline-none focus:border-[var(--color-byz-gold-shiny)] focus:ring-4 focus:ring-[var(--color-byz-gold-shiny)]/20 transition-all duration-300"
               />
             </div>
           </div>
 
-          <div className="flex justify-between items-center p-4 border border-[var(--color-byz-gold-dim)] bg-[var(--color-byz-surface)] mb-6">
+          <div className="flex justify-between items-center p-5 border-2 border-[var(--color-byz-gold-dim)] rounded-2xl bg-[var(--color-byz-surface)] mb-6 shadow-inner">
             <span className="text-xs tracking-[0.2em] text-[var(--color-byz-gold-muted)] uppercase">{t.total}</span>
             <span className="text-2xl font-bold">${donationAmount || 0}</span>
           </div>
@@ -670,7 +709,7 @@ export default function App() {
               href="https://ko-fi.com/dulemilo"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full bg-[var(--color-byz-kofi)] text-white font-sans font-bold tracking-widest py-4 rounded flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+              className="w-full bg-gradient-to-r from-[#ff5e5b] to-[#f16061] text-white font-sans font-bold tracking-widest py-4 rounded-full flex items-center justify-center gap-2 hover:scale-105 hover:shadow-lg transition-all duration-300"
             >
               <Coffee className="w-4 h-4" /> KO-FI
             </a>
@@ -678,7 +717,7 @@ export default function App() {
               href={`https://www.paypal.com/paypalme/dusanmilosavljevic36/${donationAmount || 0}USD`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full bg-[var(--color-byz-paypal)] text-white font-sans font-bold tracking-widest py-4 rounded flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+              className="w-full bg-gradient-to-r from-[#0079c1] to-[#00457c] text-white font-sans font-bold tracking-widest py-4 rounded-full flex items-center justify-center gap-2 hover:scale-105 hover:shadow-lg transition-all duration-300"
             >
               <span className="font-serif italic font-bold text-lg leading-none mr-1">P</span> PAYPAL
             </a>

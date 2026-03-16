@@ -6,23 +6,38 @@
   --font-sans: "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  --color-byz-bg: #fcf8f2;
-  --color-byz-surface: #f0e4d3;
-  --color-byz-gold: #3d260c;
-  --color-byz-gold-muted: #8a6327;
-  --color-byz-gold-dim: #d4c3ab;
-  --color-byz-red: #b82e2e;
+  --color-byz-bg: #fffbf5;
+  --color-byz-surface: #ffedd6;
+  --color-byz-gold: #3d2300;
+  --color-byz-gold-muted: #7a4b00;
+  --color-byz-gold-dim: #d4af37;
+  --color-byz-gold-shiny: #ffb703;
+  --color-byz-red: #d90429;
   --color-byz-kofi: #f16061;
   --color-byz-paypal: #0079c1;
+  --color-byz-glass: rgba(255, 255, 255, 0.5);
+}
+
+.dark {
+  --color-byz-bg: #110a03;
+  --color-byz-surface: #1c1208;
+  --color-byz-gold: #fffbf5;
+  --color-byz-gold-muted: #d4af37;
+  --color-byz-gold-dim: #7a4b00;
+  --color-byz-gold-shiny: #ffb703;
+  --color-byz-glass: rgba(0, 0, 0, 0.4);
 }
 
 @layer base {
   html {
-    font-size: 90%;
+    font-size: 115%;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   body {
     background-color: var(--color-byz-bg);
     color: var(--color-byz-gold);
     font-family: var(--font-serif);
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
